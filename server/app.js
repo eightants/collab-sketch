@@ -11,6 +11,9 @@ server.on("listening", () => {
   console.log("Listening on port 3000");
 });
 
+const { InMemorySketchStore } = require("./sketchStore");
+const sketchStore = new InMemorySketchStore();
+
 // Web sockets
 const io = require("socket.io")(server, {
   cors: {
@@ -20,8 +23,14 @@ const io = require("socket.io")(server, {
 });
 
 io.sockets.on("connection", (socket) => {
+
+  sketchStore.getStrokes().forEach((stroke) => {
+      socket.emit("path", stroke);
+  });
+
   socket.on("drawPath", (data) => {
     socket.broadcast.emit("path", data[1])
+    sketchStore.saveStrokes(data[1]);
   });
   // 	// console.log('Client connected: ' + socket.id)
 
