@@ -3,7 +3,8 @@ const express = require("express");
 const path = require('path');
 
 const app = express();
-app.use(express.static("public"));
+const buildPath = path.join(__dirname, '../client/', 'build');
+app.use(express.static(buildPath));
 const PORT = process.env.PORT || 3001;
 
 const server = http.createServer(app);
@@ -35,9 +36,6 @@ io.sockets.on("connection", (socket) => {
 
   socket.on("disconnect", () => console.log("Client has disconnected"));
 });
-
-const buildPath = path.join(__dirname, '../client/', 'build');
-app.use(express.static(buildPath));
 
 server.listen(PORT, () => {
   console.log(`server started on port ${PORT}`);
