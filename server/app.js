@@ -1,14 +1,15 @@
+/* eslint-disable */
 const http = require("http");
 const express = require("express");
-const path = require('path');
+const path = require("path");
 
 const app = express();
-const buildPath = path.join(__dirname, '../client/', 'build');
+const buildPath = path.join(__dirname, "../client/", "build");
 app.use(express.static(buildPath));
 const PORT = process.env.PORT || 3001;
 
-app.get('*', function(req,res) {
-  res.sendFile(path.join(buildPath, 'index.html'));
+app.get("*", function (req, res) {
+  res.sendFile(path.join(buildPath, "index.html"));
 });
 
 const server = http.createServer(app);
@@ -16,7 +17,7 @@ const server = http.createServer(app);
 const { InMemorySketchStore } = require("./sketchStore");
 const sketchStore = new InMemorySketchStore();
 
-// Web sockets 
+// Web sockets
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -25,13 +26,12 @@ const io = require("socket.io")(server, {
 });
 
 io.sockets.on("connection", (socket) => {
-
   sketchStore.getStrokes().forEach((stroke) => {
-      socket.emit("path", stroke);
+    socket.emit("path", stroke);
   });
 
   socket.on("drawPath", (data) => {
-    socket.broadcast.emit("path", data[1])
+    socket.broadcast.emit("path", data[1]);
     sketchStore.saveStrokes(data[1]);
   });
   // 	// console.log('Client connected: ' + socket.id)

@@ -8,6 +8,7 @@ export const CollabCanvas = () => {
   useEffect(() => {
     let myPath: paper.Path;
     const socket = io();
+    // const socket = io("localhost:3001"); // Used for development
     const canvas = canvasRef.current;
     paper.setup(canvas || "myCanvas");
 
