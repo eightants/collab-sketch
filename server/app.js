@@ -12,7 +12,7 @@ const server = http.createServer(app);
 const { InMemorySketchStore } = require("./sketchStore");
 const sketchStore = new InMemorySketchStore();
 
-// Web sockets
+// Web sockets 
 const io = require("socket.io")(server, {
   cors: {
     origin: "http://localhost:3000",
