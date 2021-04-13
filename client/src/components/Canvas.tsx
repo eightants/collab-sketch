@@ -1,5 +1,5 @@
 import paper from "paper";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import React, { useEffect, useRef } from "react";
 
 export const CollabCanvas = () => {
