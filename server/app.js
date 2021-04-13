@@ -1,15 +1,12 @@
 const http = require("http");
 const express = require("express");
+const path = require('path');
 
 const app = express();
 app.use(express.static("public"));
-
-app.set("port", "3000");
+const PORT = process.env.PORT || 3001;
 
 const server = http.createServer(app);
-server.on("listening", () => {
-  console.log("Listening on port 3000");
-});
 
 const { InMemorySketchStore } = require("./sketchStore");
 const sketchStore = new InMemorySketchStore();
@@ -39,4 +36,9 @@ io.sockets.on("connection", (socket) => {
   socket.on("disconnect", () => console.log("Client has disconnected"));
 });
 
-server.listen("3001");
+const buildPath = path.join(__dirname, '../client/', 'build');
+app.use(express.static(buildPath));
+
+server.listen(PORT, () => {
+  console.log(`server started on port ${PORT}`);
+});
