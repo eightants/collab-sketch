@@ -26,6 +26,10 @@ export const CollabCanvas = () => {
       socket.emit("drawPath", myPath);
     };
 
+    socket.on("turnStart", (drawingUser: any) => {
+        console.log("Drawing: " + socket.id + " -- ");
+    });
+
     socket.on("path", (path: paper.Path) => new paper.Path(path));
 
     return () => {

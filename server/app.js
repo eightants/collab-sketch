@@ -24,8 +24,24 @@ const io = require("socket.io")(server, {
 
 io.sockets.on("connection", (socket) => {
 
+  // List of all users
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+      users.push({
+          userID: id,
+          // username: socket.username,
+      });
+  }
+  console.log(users);
+
+  let drawingUserIdx = 0;
+
+  socket.on("startTimer", () => {
+    io.emit("turnStart", users[drawingUserIdx]);
+  });
+
   sketchStore.getStrokes().forEach((stroke) => {
-      socket.emit("path", stroke);
+    socket.emit("path", stroke);
   });
 
   socket.on("drawPath", (data) => {
