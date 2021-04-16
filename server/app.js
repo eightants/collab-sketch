@@ -1,15 +1,21 @@
+/* eslint-disable */
 const http = require("http");
 const express = require("express");
+const path = require("path");
 
 const app = express();
-app.use(express.static("public"));
+const buildPath = path.join(__dirname, "../client/", "build");
+app.use(express.static(buildPath));
+const PORT = process.env.PORT || 3001;
 
-app.set("port", "3000");
+app.get("*", function (req, res) {
+  res.sendFile(path.join(buildPath, "index.html"));
+});
 
 const server = http.createServer(app);
-server.on("listening", () => {
-  console.log("Listening on port 3000");
-});
+
+const { InMemorySketchStore } = require("./sketchStore");
+const sketchStore = new InMemorySketchStore();
 
 const { InMemorySketchStore } = require("./sketchStore");
 const sketchStore = new InMemorySketchStore();
@@ -23,13 +29,12 @@ const io = require("socket.io")(server, {
 });
 
 io.sockets.on("connection", (socket) => {
-
   sketchStore.getStrokes().forEach((stroke) => {
-      socket.emit("path", stroke);
+    socket.emit("path", stroke);
   });
 
   socket.on("drawPath", (data) => {
-    socket.broadcast.emit("path", data[1])
+    socket.broadcast.emit("path", data[1]);
     sketchStore.saveStrokes(data[1]);
   });
   // 	// console.log('Client connected: ' + socket.id)
@@ -39,4 +44,6 @@ io.sockets.on("connection", (socket) => {
   socket.on("disconnect", () => console.log("Client has disconnected"));
 });
 
-server.listen("3001");
+server.listen(PORT, () => {
+  console.log(`server started on port ${PORT}`);
+});

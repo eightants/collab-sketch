@@ -1,5 +1,5 @@
 import paper from "paper";
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import React, { useEffect, useRef } from "react";
 
 export const CollabCanvas = () => {
@@ -7,7 +7,8 @@ export const CollabCanvas = () => {
 
   useEffect(() => {
     let myPath: paper.Path;
-    const socket = io("http://localhost:3001");
+    const socket = io();
+    // const socket = io("localhost:3001"); // Used for development
     const canvas = canvasRef.current;
     paper.setup(canvas || "myCanvas");
 
