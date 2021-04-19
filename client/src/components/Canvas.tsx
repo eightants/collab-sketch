@@ -1,14 +1,11 @@
 import paper from "paper";
-import { io } from "socket.io-client";
 import React, { useEffect, useRef } from "react";
 
-export const CollabCanvas = () => {
+export const CollabCanvas = ({ socket } : {socket: any}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
+  useEffect(()=> {
     let myPath: paper.Path;
-    const socket = io();
-    // const socket = io("localhost:3001"); // Used for development
     const canvas = canvasRef.current;
     paper.setup(canvas || "myCanvas");
 
@@ -28,11 +25,7 @@ export const CollabCanvas = () => {
     };
 
     socket.on("path", (path: paper.Path) => new paper.Path(path));
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+  }, [socket]);
 
   return <canvas id="myCanvas" ref={canvasRef} data-paper-resize></canvas>;
 };
