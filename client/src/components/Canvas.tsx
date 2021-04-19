@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 export const CollabCanvas = ({ socket } : {socket: any}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect((socket) => {
+  useEffect(()=> {
     let myPath: paper.Path;
     const canvas = canvasRef.current;
     paper.setup(canvas || "myCanvas");
@@ -25,11 +25,7 @@ export const CollabCanvas = ({ socket } : {socket: any}) => {
     };
 
     socket.on("path", (path: paper.Path) => new paper.Path(path));
-
-    return () => {
-      socket.disconnect(); // should this be moved somewhere else?
-    };
-  }, []);
+  }, [socket]);
 
   return <canvas id="myCanvas" ref={canvasRef} data-paper-resize></canvas>;
 };
