@@ -12,8 +12,12 @@
 }
 
 .btnDiv {
-  padding: 4px;
+  padding: 5px;
   display: inline-block;
+}
+
+.btnDiv span {
+  font-size: 16px;
 }
 
 .btnDiv button {

@@ -18,7 +18,7 @@ export const Button = ({
       onClick={onClick}
       style={width ? { width: width } : {}}
     >
-      {text}
+      <span>{text}</span>
     </button>
   </div>
 );

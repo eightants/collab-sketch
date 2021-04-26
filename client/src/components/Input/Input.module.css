@@ -1,0 +1,15 @@
+.codeInput {
+  background-color: white;
+  border: 1px solid #cacaca;
+}
+
+.btnDiv {
+  padding: 4px;
+  display: inline-block;
+}
+
+.btnDiv input {
+  border-radius: 5px;
+  padding: 15px 15px;
+  font-size: 14px;
+}
