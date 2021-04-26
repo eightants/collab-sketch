@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import { io } from "socket.io-client";
 import "./App.css";
@@ -6,10 +6,10 @@ import { Create } from "./pages/Create/Create";
 import { Draw } from "./pages/Draw";
 import { Home } from "./pages/Home/Home";
 import { Join } from "./pages/Join/Join";
-import { Lobby } from "./pages/Lobby";
+import { Lobby } from "./pages/Lobby/Lobby";
 
 function App() {
-  const socket = io();
+  const [socket] = useState(io());
   // const socket = io("localhost:3001"); // Used for development
   useEffect(() => {
     return () => {
