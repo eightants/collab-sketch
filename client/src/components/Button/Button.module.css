@@ -23,8 +23,8 @@
 .btnDiv button {
   border-radius: 5px;
   text-align: center;
-  padding: 15px 30px;
-  font-weight: 600;
+  padding: 12px 30px;
+  width: 100%;
 }
 
 .btnDiv button:hover {

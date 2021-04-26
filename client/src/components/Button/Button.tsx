@@ -4,7 +4,7 @@ import styles from "./Button.module.css";
 export const Button = ({
   text,
   variant = "light",
-  width,
+  width = "100%",
   onClick = () => {}
 }: {
   text: string;
@@ -12,11 +12,10 @@ export const Button = ({
   width?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }) => (
-  <div className={styles.btnDiv}>
+  <div className={styles.btnDiv} style={{ width: width }}>
     <button
       className={variant === "light" ? styles.btnLight : styles.btnDark}
       onClick={onClick}
-      style={width ? { width: width } : {}}
     >
       <span>{text}</span>
     </button>

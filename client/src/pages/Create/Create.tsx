@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
+import styles from "./Create.module.css";
 import { Button } from "../../components/Button/Button";
 
 // Function to generate unique room ID
@@ -32,11 +33,17 @@ export const Create = ({ socket }: { socket: any }) => {
     console.log("CREATE");
   };
   return (
-    <div>
-      <Button text="Create Session" variant="dark" onClick={handleCreateLobby} />
-      <Link to="/">
-        <Button text="Back" />
-      </Link>
+    <div className={styles.mainContainer}>
+      <div className={styles.createContent}>
+        <Button
+          text="Create Session"
+          variant="dark"
+          onClick={handleCreateLobby}
+        />
+        <Link to="/">
+          <Button text="Back" />
+        </Link>
+      </div>
     </div>
   );
 };
