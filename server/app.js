@@ -25,22 +25,43 @@ const io = require("socket.io")(server, {
   }
 });
 
+// List of all current users on server
+const users = [];
+
 io.sockets.on("connection", (socket) => {
 
-  // List of all users
-  const users = [];
-  for (let [id, socket] of io.of("/").sockets) {
-      users.push({
-          userID: id,
-          // username: socket.username,
-      });
-  }
+  // // Notify other users of new user
+  // socket.broadcast.emit("user connected", {
+  //   userID: socket.id,
+  //   // username: socket.username,
+  // });
+
+  // Update list of all current users on server
+  // const users = [];
+  // for (let [id, socket] of io.of("/").sockets) {
+  //   users.push({
+  //     userID: id,
+  //     // username: socket.username,
+  //   });
+  // }
+
+  // socket.emit(users);
+
+  // Add new users to list
+  users.push({
+    userID: socket.id,
+    // username: socket.username,
+  });
+
   console.log(users);
 
-  let drawingUserIdx = 0;
-
+  const time = {
+    minutes: 0,
+    seconds: 35
+  }
+  const { timer } = require("./timer");
   socket.on("startTimer", () => {
-    io.emit("turnStart", users[drawingUserIdx]);
+    timer(io, users, time.minutes, time.seconds);
   });
 
   sketchStore.getStrokes().forEach((stroke) => {
@@ -55,7 +76,19 @@ io.sockets.on("connection", (socket) => {
 
   // 	// socket.on('mouse', (data) => socket.broadcast.emit('mouse', data))
 
-  socket.on("disconnect", () => console.log("Client has disconnected"));
+  socket.on("disconnect", () => {
+    let i = 0;
+    while (i < users.length) {
+      if (users[i].userID === socket.id) {
+        users.splice(i, 1);
+        break;
+      } else {
+        ++i;
+      }
+    }
+
+    console.log("Client has disconnected: " + socket.id);
+  });
 });
 
 server.listen(PORT, () => {

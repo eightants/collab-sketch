@@ -1,41 +1,42 @@
 import paper from "paper";
-import { io } from "socket.io-client";
 import React, { useEffect, useRef } from "react";
 
-export const CollabCanvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+export const CollabCanvas = ({ socket, drawingUser } : { socket: any, drawingUser: any}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null); // Is useRef needed here?
 
   useEffect(() => {
-    let myPath: paper.Path;
-    const socket = io();
-    // const socket = io("localhost:3001"); // Used for development
     const canvas = canvasRef.current;
     paper.setup(canvas || "myCanvas");
+  }, []);
 
-    paper.view.onMouseDown = (event: any) => {
-      myPath = new paper.Path();
-      myPath.strokeColor = new paper.Color(0, 0, 0);
-      myPath.add(event.point);
-    };
+  useEffect(()=> {
+    console.log(drawingUser === socket.id);
+    
+    if (drawingUser === socket.id) {
+      let myPath: paper.Path;
 
-    paper.view.onMouseDrag = (event: any) => {
-      myPath.add(event.point);
-    };
+      paper.view.onMouseDown = (event: any) => {
+        myPath = new paper.Path();
+        myPath.strokeColor = new paper.Color(0, 0, 0);
+        myPath.add(event.point);
+      };
 
-    paper.view.onMouseUp = () => {
-      console.log(myPath);
-      socket.emit("drawPath", myPath);
-    };
+      paper.view.onMouseDrag = (event: any) => {
+        myPath.add(event.point);
+      };
 
-    socket.on("turnStart", (drawingUser: any) => {
-        console.log("Drawing: " + socket.id + " -- ");
+      paper.view.onMouseUp = () => {
+        console.log(myPath);
+        socket.emit("drawPath", myPath);
+      };
+    }
+  }, [drawingUser]);
+
+  useEffect(() => {
+    socket.on("path", (path: paper.Path) => {
+      console.log(path);
+      new paper.Path(path);
     });
-
-    socket.on("path", (path: paper.Path) => new paper.Path(path));
-
-    return () => {
-      socket.disconnect();
-    };
   }, []);
 
   return <canvas id="myCanvas" ref={canvasRef} data-paper-resize></canvas>;
