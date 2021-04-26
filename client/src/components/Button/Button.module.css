@@ -1,0 +1,32 @@
+.btnLight {
+  background-color: white;
+  color: #111111;
+  border: 2px solid #111111;
+
+}
+
+.btnDark {
+  color: white;
+  background-color: #111111;
+  border: 0px;
+}
+
+.btnDiv {
+  padding: 5px;
+  display: inline-block;
+}
+
+.btnDiv span {
+  font-size: 16px;
+}
+
+.btnDiv button {
+  border-radius: 5px;
+  text-align: center;
+  padding: 12px 30px;
+  width: 100%;
+}
+
+.btnDiv button:hover {
+  cursor: pointer;
+}
