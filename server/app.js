@@ -15,7 +15,10 @@ app.get("*", function (req, res) {
 const server = http.createServer(app);
 
 const { InMemorySketchStore } = require("./sketchStore");
-const sketchStore = new InMemorySketchStore();
+const sketchStore = {};
+
+const { InMemoryLobbyInfo } = require("./lobbyInfo");
+const lobbies = {};
 
 // Web sockets
 const io = require("socket.io")(server, {
@@ -64,17 +67,59 @@ io.sockets.on("connection", (socket) => {
     timer(io, users, time.minutes, time.seconds);
   });
 
-  sketchStore.getStrokes().forEach((stroke) => {
-    socket.emit("path", stroke);
+  socket.on("startCanvas", (id) => {
+    if (sketchStore[id]) {
+      sketchStore[id].getStrokes().forEach((stroke) => {
+        io.sockets.to(id).emit("path", stroke);
+      });
+    }
   });
 
-  socket.on("drawPath", (data) => {
-    socket.broadcast.emit("path", data[1]);
-    sketchStore.saveStrokes(data[1]);
+  socket.on("drawPath", ({ id, data }) => {
+    io.sockets.to(id).emit("path", data[1]);
+    if (sketchStore[id]) {
+      sketchStore[id].saveStrokes(data[1]);
+    } else {
+      sketchStore[id] = new InMemorySketchStore();
+      sketchStore[id].saveStrokes(data[1]);
+    }
   });
-  // 	// console.log('Client connected: ' + socket.id)
 
-  // 	// socket.on('mouse', (data) => socket.broadcast.emit('mouse', data))
+  socket.on("onCreateLobby", (lobby) => {
+    if (!lobby.id) return;
+    lobbies[lobby.id] = new InMemoryLobbyInfo(lobby);
+    socket.emit("newLobbyCreated", { ...lobby, mySocketId: socket.id });
+    socket.join(lobby.id);
+  });
+
+  socket.on("onJoinLobby", (user) => {
+    const room = io.sockets.adapter.rooms.get(user.id);
+
+    // If the room exists...
+    if (room != undefined) {
+      // Join the room
+      socket.join(user.id);
+      // Emit an event notifying the clients that the player has joined the room.
+      io.sockets
+        .in(user.id)
+        .emit("joinedLobby", { name: user.name || "Anonymous", id: user.id });
+    } else {
+      socket.emit("error", { message: "This room does not exist." });
+    }
+  });
+
+  socket.on("onStartGame", (id) => {
+    lobbies[id].setStarted(true);
+    io.sockets.in(id).emit("gameStarted", {});
+  });
+
+  //  When visiting the draw/ link directly, check if socket is already in room
+  socket.on("onDrawJoin", (id) => {
+    const currentRooms = io.sockets.adapter.sids.get(socket.id);
+    if (!currentRooms.has(id)) {
+      io.sockets.to(socket.id).emit("notJoined", id);
+    }
+  });
 
   socket.on("disconnect", () => {
     let i = 0;

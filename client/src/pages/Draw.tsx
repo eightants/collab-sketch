@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import { CollabCanvas } from "../components/Canvas";
 import { Time } from "../components/DisplayTime"
 
-export const Draw = ({ socket } : { socket: any }) => {
+export const Draw = ({ socket }: { socket: any }) => {
+
+  const { id } = useParams<{ id: string }>();
+  const router = useHistory();
+
+  useEffect(() => {
+    socket.emit("onDrawJoin", id);
+    socket.on("notJoined", (id: string) => {
+      router.push(`/join/${id}`);
+    });
+  });
 
   const [drawingUser, setDrawingUser] = useState(null);
 
@@ -38,7 +49,7 @@ export const Draw = ({ socket } : { socket: any }) => {
       <button onClick={startTimer}>Start Timer</button>
 
       <div className="whiteboard">
-          <CollabCanvas socket={socket} drawingUser={drawingUser} />
+          <CollabCanvas socket={socket} id={id} drawingUser={drawingUser} />
       </div>
 
     </div>

@@ -1,17 +1,18 @@
 import paper from "paper";
 import React, { useEffect, useRef } from "react";
 
-export const CollabCanvas = ({ socket, drawingUser } : { socket: any, drawingUser: any}) => {
+export const CollabCanvas = ({ socket, id, drawingUser }: { socket: any; id: string, drawingUser: any }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null); // Is useRef needed here?
 
   useEffect(() => {
     const canvas = canvasRef.current;
     paper.setup(canvas || "myCanvas");
-  }, []);
+    socket.emit("startCanvas", id);
+  }, [id]);
 
   useEffect(()=> {
     console.log(drawingUser === socket.id);
-    
+
     if (drawingUser === socket.id) {
       let myPath: paper.Path;
 
@@ -27,10 +28,10 @@ export const CollabCanvas = ({ socket, drawingUser } : { socket: any, drawingUse
 
       paper.view.onMouseUp = () => {
         console.log(myPath);
-        socket.emit("drawPath", myPath);
+        socket.emit("drawPath", { data: myPath, id });
       };
     }
-  }, [drawingUser]);
+  }, [id, drawingUser]);
 
   useEffect(() => {
     socket.on("path", (path: paper.Path) => {
