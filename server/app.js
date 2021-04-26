@@ -54,17 +54,17 @@ io.sockets.on("connection", (socket) => {
     socket.join(lobby.id);
   });
 
-  socket.on("onJoinLobby", (gameId) => {
-    const room = io.sockets.adapter.rooms.get(gameId);
+  socket.on("onJoinLobby", (user) => {
+    const room = io.sockets.adapter.rooms.get(user.id);
 
     // If the room exists...
     if (room != undefined) {
       // Join the room
-      socket.join(gameId);
+      socket.join(user.id);
       // Emit an event notifying the clients that the player has joined the room.
       io.sockets
-        .in(gameId)
-        .emit("joinedLobby", { name: "Anonymous", id: gameId });
+        .in(user.id)
+        .emit("joinedLobby", { name: user.name || "Anonymous", id: user.id });
     } else {
       socket.emit("error", { message: "This room does not exist." });
     }

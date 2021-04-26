@@ -5,6 +5,7 @@ import { Input } from "../../components/Input/Input";
 
 export const Join = ({ socket }: { socket: any }) => {
   const [enteredID, setEnteredID] = useState("");
+  const [nickname, setNickname] = useState("");
   const { id } = useParams<{ id: string }>();
   const router = useHistory();
 
@@ -18,11 +19,16 @@ export const Join = ({ socket }: { socket: any }) => {
   }, [id, router, socket]);
 
   const handleJoinLobby = () => {
-    socket.emit("onJoinLobby", enteredID);
+    socket.emit("onJoinLobby", { id: enteredID, nickname: nickname });
   };
 
   return (
     <div>
+      <Input
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
+        placeholder={"Enter nickname"}
+      />
       <Input
         value={enteredID}
         onChange={(e) => setEnteredID(e.target.value)}
