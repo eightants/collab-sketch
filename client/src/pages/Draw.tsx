@@ -11,7 +11,7 @@ export const Draw = ({ socket }: { socket: any }) => {
     socket.on("notJoined", (id: string) => {
       router.push(`/join/${id}`);
     });
-  });
+  }, [id, router, socket]);
 
   return (
     <div className="whiteboard">

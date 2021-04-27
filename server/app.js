@@ -29,6 +29,8 @@ const io = require("socket.io")(server, {
 });
 
 io.sockets.on("connection", (socket) => {
+  console.log("Connected", socket.id);
+
   socket.on("startCanvas", (id) => {
     if (sketchStore[id]) {
       sketchStore[id].getStrokes().forEach((stroke) => {
@@ -49,7 +51,7 @@ io.sockets.on("connection", (socket) => {
 
   socket.on("onCreateLobby", (lobby) => {
     if (!lobby.id) return;
-    lobbies[lobby.id] = new InMemoryLobbyInfo(lobby);
+    lobbies[lobby.id] = new InMemoryLobbyInfo({ ...lobby, host: socket.id });
     socket.emit("newLobbyCreated", { ...lobby, mySocketId: socket.id });
     socket.join(lobby.id);
   });
@@ -61,13 +63,42 @@ io.sockets.on("connection", (socket) => {
     if (room != undefined) {
       // Join the room
       socket.join(user.id);
+      const newUser = {
+        nickname: user.nickname || "Anonymous",
+        sid: socket.id,
+        id: user.id
+      };
+      lobbies[user.id].addMember(newUser);
       // Emit an event notifying the clients that the player has joined the room.
-      io.sockets
-        .in(user.id)
-        .emit("joinedLobby", { name: user.name || "Anonymous", id: user.id });
+      if (lobbies[user.id].getStarted()) {
+        io.sockets
+          .to(lobbies[user.id].getHost())
+          .emit("joinedStartedLobby", lobbies[user.id].getMembers());
+      } else {
+        io.sockets
+          .in(user.id)
+          .emit("joinedLobby", lobbies[user.id].getMembers());
+      }
     } else {
       socket.emit("error", { message: "This room does not exist." });
     }
+  });
+
+  socket.on("onLeave", (id) => {
+    socket.leave(id);
+    lobbies[id].removeMember(socket.id);
+    io.sockets.to(socket.id).emit("leaveLobby");
+    io.sockets.in(id).emit("joinedLobby", lobbies[id].getMembers());
+  });
+
+  socket.on("kickUser", (sid) => {
+    io.sockets.to(sid).emit("kickedUser");
+  });
+
+  socket.on("checkPermissions", (id) => {
+    io.sockets
+      .to(socket.id)
+      .emit("isHost", lobbies[id].getHost() === socket.id);
   });
 
   socket.on("onStartGame", (id) => {

@@ -1,0 +1,20 @@
+.playerDiv {
+  margin: 0 0 30px 0;
+  min-height: 180px;
+}
+
+.playerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0px;
+}
+
+.kickBtn {
+  color:rgb(214, 63, 63);
+  padding-right: 10px;
+}
+
+.kickBtn:hover {
+  cursor: pointer;
+}

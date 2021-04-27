@@ -14,10 +14,13 @@ export const Join = ({ socket }: { socket: any }) => {
     if (id) {
       setEnteredID(id);
     }
-    socket.on("joinedLobby", (data: any) => {
-      router.push(`/draw/${data.id}`);
+    socket.on("joinedLobby", () => {
+      router.push(`/lobby/${enteredID}`);
     });
-  }, [id, router, socket]);
+    socket.on("joinedStartedLobby", () => {
+      router.push(`/draw/${enteredID}`);
+    });
+  }, [enteredID, id, router, socket]);
 
   const handleJoinLobby = () => {
     socket.emit("onJoinLobby", { id: enteredID, nickname: nickname });
