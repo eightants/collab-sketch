@@ -4,13 +4,67 @@
   width: 100%;
 }
 
-#myCanvas {
-  height: 100vh;
+.drawPage {
+  display: flex;
   width: 100%;
 }
 
+.leftSidebar {
+  border-right: 1px solid #808080;
+  flex-basis: 240px;
+}
+
+.drawingTools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.drawingTools h2 {
+  margin: 5px 10px;
+}
+
+.colorIcon {
+  width: 30px;
+  height: 30px;
+  margin: 5px;
+  border-radius: 5px;
+}
+
+.colorIcon:hover {
+  cursor: pointer;
+}
+
+.drawIcon {
+  padding: 8px 10px;
+  border-radius: 5px;
+}
+
+.drawIcon:hover {
+  background-color: rgb(230, 230, 230);
+  cursor: pointer;
+}
+
+.drawIcon img {
+  width: 24px;
+  height: 24px;
+}
+
+#myCanvas {
+  height: 100vh;
+  width: 100%;
+
+}
+
 #myCanvas:hover {
-  cursor: crosshair;
+  cursor: url("https://image.flaticon.com/icons/png/24/999/999791.png") 0 24, auto;
+}
+
+.iconText {
+  text-transform: none;
+  color: black;
 }
 
 * {
