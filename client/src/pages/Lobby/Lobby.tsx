@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
-import styles from "./Lobby.module.css";
-import shared from "../../assets/shared.module.css";
-import { Button } from "../../components/Button/Button";
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
+import styles from './Lobby.module.css';
+import shared from '../../assets/shared.module.css';
+import { Button } from '../../components/Button/Button';
 
 export const Lobby = ({ socket }: { socket: any }) => {
   const router = useHistory();
@@ -11,39 +11,44 @@ export const Lobby = ({ socket }: { socket: any }) => {
   const [lobbyUsers, setLobbyUsers] = useState<Array<any>>([]);
 
   useEffect(() => {
-    socket.emit("checkPermissions", id);
-    socket.on("isHost", (h: boolean) => setIsHost(h));
+    socket.emit('checkPermissions', id);
+    socket.on('roomError', () => {
+      router.push('');
+    });
+    socket.on('isHost', (h: boolean) => setIsHost(h));
 
-    socket.emit("onDrawJoin", id);
-    socket.on("notJoined", (id: string) => {
+    socket.emit('onDrawJoin', id);
+    socket.on('notJoined', (id: string) => {
       router.push(`/join/${id}`);
     });
 
-    socket.on("kickedUser", () => {
-      socket.emit("onLeave", id);
+    socket.on('kickedUser', () => {
+      socket.emit('onLeave', id);
     });
 
-    socket.on("leaveLobby", () => {
+    socket.on('leaveLobby', () => {
       if (isHost) {
-        router.push("/create");
+        router.push('/create');
       } else {
-        router.push("/join");
+        router.push('/join');
       }
     });
 
-    socket.on("gameStarted", () => {
+    socket.on('gameStarted', (id: string) => {
+      console.log("pushed stet", id)
       router.push(`/draw/${id}`);
     });
   }, [id, isHost, router, socket]);
 
   useEffect(() => {
-    socket.on("joinedLobby", (users: any) => {
+    socket.on('joinedLobby', (users: any) => {
       setLobbyUsers(users);
     });
   }, [socket]);
 
   const handleStart = () => {
-    socket.emit("onStartGame", id);
+    window.sessionStorage.setItem("room", id)
+    socket.emit('onStartGame', id);
   };
 
   return (
@@ -57,13 +62,13 @@ export const Lobby = ({ socket }: { socket: any }) => {
                     <div>{user.nickname}</div>
                     <div
                       className={styles.kickBtn}
-                      onClick={() => socket.emit("kickUser", user.sid)}
+                      onClick={() => socket.emit('kickUser', user.sid)}
                     >
                       Kick
                     </div>
                   </div>
                 ))
-              : "Waiting for people to join..."}
+              : 'Waiting for people to join...'}
           </div>
         ) : (
           <div className={styles.playerDiv}>
@@ -71,9 +76,9 @@ export const Lobby = ({ socket }: { socket: any }) => {
           </div>
         )}
         {isHost && (
-          <Button text="Start Session" variant="dark" onClick={handleStart} />
+          <Button text='Start Session' variant='dark' onClick={handleStart} />
         )}
-        <Button text="Leave" onClick={() => socket.emit("onLeave", id)} />
+        <Button text='Leave' onClick={() => socket.emit('onLeave', id)} />
       </div>
     </div>
   );
