@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import paper from 'paper';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
+import { DOMAIN } from '../../constants';
 
 export const ViewSketch = ({ socket }: { socket: any }) => {
   const router = useHistory();
@@ -15,7 +16,7 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     };
-    fetch('http://localhost:3001/api/get/' + id, requestOptions)
+    fetch(DOMAIN + '/api/get/' + id, requestOptions)
       .then((res) => res.json())
       .then((d) => {
         console.log(d);

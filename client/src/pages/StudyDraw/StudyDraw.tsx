@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import paper from 'paper';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
+import { DOMAIN } from '../../constants';
 
 const CollabCanvas = ({
   socket,
@@ -179,7 +180,7 @@ export const StudyDraw = ({ socket }: { socket: any }) => {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     };
-    fetch('http://localhost:3001/api/get/' + roomId, requestOptions)
+    fetch(DOMAIN + '/api/get/' + roomId, requestOptions)
       .then((res) => res.json())
       .then((d) => {
         console.log(d);
@@ -194,7 +195,7 @@ export const StudyDraw = ({ socket }: { socket: any }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     };
-    fetch('http://localhost:3001/api/create', requestOptions).then((res) => {});
+    fetch(DOMAIN + '/api/create', requestOptions).then((res) => {});
   };
 
   return (

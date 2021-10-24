@@ -4,11 +4,14 @@ import styles from '../Join/Join.module.css';
 import sessionStyles from './Session.module.css';
 import { Button } from '../../components/Button/Button';
 import { Input } from '../../components/Input/Input';
+import { DOMAIN } from '../../constants';
+import { Alert } from '@material-ui/lab';
 
 export const Session = () => {
   const [enteredID, setEnteredID] = useState('');
   const [timer, setTimer] = useState(300);
   const [prompt, setPrompt] = useState('');
+  const [created, setCreated] = useState(false);
 
   const handleJoinLobby = () => {
     const requestOptions = {
@@ -21,8 +24,10 @@ export const Session = () => {
         paths: []
       })
     };
-    console.log(enteredID);
-    fetch('http://localhost:3001/api/create', requestOptions).then((res) => {});
+    fetch(DOMAIN + '/api/create', requestOptions).then((res) => {
+      setEnteredID('');
+      setCreated(true);
+    });
   };
 
   return (
@@ -51,6 +56,7 @@ export const Session = () => {
         <Link to='/'>
           <Button text='Back' />
         </Link>
+        {created && <Alert severity='success'>Study Created!</Alert>}
       </div>
     </div>
   );
