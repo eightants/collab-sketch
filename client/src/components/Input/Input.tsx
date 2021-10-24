@@ -5,11 +5,13 @@ export const Input = ({
   placeholder,
   width = "100%",
   value,
+  disabled = false,
   onChange = () => {}
 }: {
   placeholder?: string;
   width?: string;
   value: string | number;
+  disabled?: boolean;
   onChange?: ChangeEventHandler<HTMLInputElement>;
 }) => (
   <div className={styles.btnDiv} style={{ width: width }}>
@@ -18,6 +20,7 @@ export const Input = ({
       value={value}
       placeholder={placeholder || "Enter text..."}
       onChange={onChange}
+      disabled={disabled}
     />
   </div>
 );

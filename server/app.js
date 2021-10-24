@@ -2,11 +2,72 @@
 const http = require('http');
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 const buildPath = path.join(__dirname, '../client/', 'build');
 app.use(express.static(buildPath));
+app.use(express.json()) 
 const PORT = process.env.PORT || 3001;
+
+const { MongoClient } = require('mongodb');
+// main mongo function
+async function mongo(operation, params) {
+  const uri =process.env.CSKETCH_URI;
+  const client = new MongoClient(uri);
+  try {
+    // Connect to the MongoDB cluster
+    await client.connect();
+    // Make the appropriate DB calls
+    if (operation == 'postRoom') {
+      await updateRoom(client, params);
+    } else if (operation == 'getRoom') {
+      return await getRoom(client, params);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client.close();
+  }
+}
+
+async function updateRoom(client, params) {
+  let id = params["_id"]
+  result = await client.db('sketch').collection('rooms').updateOne(
+    { _id: id },
+    {
+      $set: params
+    },
+    { upsert: true }
+  );
+}
+
+async function getRoom(client, id) {
+  return await client
+    .db('sketch')
+    .collection('rooms')
+    .findOne({ _id: id });
+}
+
+app.post('/api/create', cors(), async function (req, res) {
+  var obj = req.body
+  await mongo('postRoom', obj)
+    .then((re) => {
+      return res.json(re);
+    })
+    .catch(console.error);
+});
+
+app.get('/api/get/:id', cors(), async function (req, res) {
+
+  await mongo('getRoom', req.params.id)
+    .then((re) => {
+      console.log(re)
+      return res.json(re);
+    })
+    .catch(console.error);
+});
 
 app.get('*', function (req, res) {
   res.sendFile(path.join(buildPath, 'index.html'));

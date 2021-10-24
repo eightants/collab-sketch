@@ -14,6 +14,27 @@
   flex-basis: 240px;
 }
 
+.canvasDiv {
+  position: relative;
+}
+
+.overlay {
+  background-color: rgba(197, 197, 197, 0.8);
+  z-index: 5;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  padding: 20px;
+}
+
+.overlayView {
+  z-index: 5;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  padding: 20px;
+}
+
 .drawingTools {
   display: flex;
   flex-wrap: wrap;
@@ -65,6 +86,19 @@
 .iconText {
   text-transform: none;
   color: black;
+}
+
+.prompt {
+  margin-top: 40px;
+  padding: 15px;
+}
+
+.promptDiv {
+  background-color: white;
+  border-radius: 5px;
+  padding: 16px 30px;
+  width: 100%;
+  margin: 10px 0;
 }
 
 * {

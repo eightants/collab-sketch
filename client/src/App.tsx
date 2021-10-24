@@ -7,6 +7,10 @@ import { Draw } from "./pages/Draw";
 import { Home } from "./pages/Home/Home";
 import { Join } from "./pages/Join/Join";
 import { Lobby } from "./pages/Lobby/Lobby";
+import { Session } from "./pages/Session/Session";
+import { Study } from "./pages/Study/Study";
+import { StudyDraw } from "./pages/StudyDraw/StudyDraw";
+import { ViewSketch } from "./pages/ViewSketch/ViewSketch";
 
 function App() {
   const [socket] = useState(io());
@@ -34,6 +38,21 @@ function App() {
         </Route>
         <Route exact path="/draw/:id">
           <Draw socket={socket} />
+        </Route>
+        <Route exact path="/session">
+          <Session />
+        </Route>
+        <Route exact path="/studydraw">
+          <StudyDraw socket={socket} />
+        </Route>
+        <Route exact path="/study">
+          <Study socket={socket} />
+        </Route>
+        <Route exact path="/study/:id">
+          <Study socket={socket} />
+        </Route>
+        <Route exact path="/view/:id">
+          <ViewSketch socket={socket} />
         </Route>
       </Switch>
     </Router>
