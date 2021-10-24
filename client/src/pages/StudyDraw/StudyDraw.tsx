@@ -19,7 +19,7 @@ const CollabCanvas = ({
   setData: (data: any) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [color, setColor] = useState('#000');
+  const [color] = useState('#000');
   const [paths, setPaths] = useState<Array<any>>([]);
   const [started, setStarted] = useState(false);
   const [timerVal, setTimerVal] = useState(0);
@@ -107,7 +107,7 @@ const CollabCanvas = ({
             <h2 className='iconText'>CSketch Session</h2>
           </div>
         </Link>
-        <div className='drawingTools'>
+        {/* <div className='drawingTools'>
           <div
             className='colorIcon'
             onClick={() => setColor('#c4c4c4')}
@@ -128,7 +128,7 @@ const CollabCanvas = ({
             onClick={() => setColor('#000')}
             style={{ backgroundColor: '#000' }}
           ></div>
-        </div>
+        </div> */}
         {data && (
           <div className='prompt'>
             <strong>Prompt: </strong>
