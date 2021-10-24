@@ -23,6 +23,7 @@ const CollabCanvas = ({
   const [paths, setPaths] = useState<Array<any>>([]);
   const [started, setStarted] = useState(false);
   const [timerVal, setTimerVal] = useState(0);
+  const router = useHistory();
 
   useEffect(() => {
     if (data) {
@@ -146,11 +147,21 @@ const CollabCanvas = ({
             {data && (
               <div>
                 <div className='promptDiv'>{data.prompt}</div>
-                <Button
-                  text='Start Sketching'
-                  variant='dark'
-                  onClick={handleSketchStart}
-                />
+                {timerVal ? (
+                  <Button
+                    text='Start Sketching'
+                    variant='dark'
+                    onClick={handleSketchStart}
+                  />
+                ) : (
+                  <Button
+                    text='View Sketch'
+                    variant='dark'
+                    onClick={() => {
+                      router.push('/view/' + id);
+                    }}
+                  />
+                )}
               </div>
             )}
           </div>

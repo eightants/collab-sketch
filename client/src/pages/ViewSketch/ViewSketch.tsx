@@ -42,6 +42,14 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
     }
   };
 
+  const clearCanvas = () => {
+    if (data) {
+      for (const path of data.paths) {
+        path.path.remove();
+      }
+    }
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     paper.setup(canvas || 'myCanvas');
@@ -64,6 +72,7 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
           )}
           <div className='prompt'>
             <Button text={'Start Replay'} onClick={startReplay} />
+            <Button text={'Clear'} onClick={clearCanvas} />
           </div>
         </div>
         <div className='canvasDiv'>
