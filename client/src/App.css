@@ -79,8 +79,12 @@
 
 }
 
-#myCanvas:hover {
+.penSelected:hover {
   cursor: url("https://image.flaticon.com/icons/png/24/999/999791.png") 0 24, auto;
+}
+
+.eraserSelected:hover {
+  cursor: url("assets/eraser.png") 0 24, auto;
 }
 
 .iconText {

@@ -10,6 +10,8 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
   const [data, setData] = useState<sessionData>();
   const { id } = useParams<{ id: string }>();
   const [, setCurrPath] = useState(0);
+  const [clearCanvasTrigger, setClearCanvasTrigger] = useState(false);
+  const [timerVar, setTimerVar] = useState(setInterval(() => {}, 100));
 
   useEffect(() => {
     const requestOptions = {
@@ -35,25 +37,29 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
             return 0;
           }
           const newPath = new paper.Path(data.paths[curr].path[1]);
-          newPath.strokeColor = new paper.Color('#000');
+          newPath.strokeColor = new paper.Color(
+            data.paths[curr].path[1].strokeColor[0] === 0 ? '#000' : '#fff'
+          );
           return curr + 1;
         });
-      }, 500);
+      }, 100);
+      setTimerVar(timerInt);
     }
   };
 
   const clearCanvas = () => {
     if (data) {
-      for (const path of data.paths) {
-        path.path.remove();
-      }
+      clearInterval(timerVar);
+      setClearCanvasTrigger(true);
+      setCurrPath(0);
     }
   };
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    setClearCanvasTrigger(false);
     paper.setup(canvas || 'myCanvas');
-  }, []);
+  }, [clearCanvasTrigger]);
 
   return (
     <div className='whiteboard'>

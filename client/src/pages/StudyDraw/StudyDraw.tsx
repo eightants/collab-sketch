@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import paper from 'paper';
 import { Link } from 'react-router-dom';
+import Eraser from '../../assets/eraser.png';
 import { Button } from '../../components/Button/Button';
 import { DOMAIN } from '../../constants';
 
@@ -19,7 +20,9 @@ const CollabCanvas = ({
   setData: (data: any) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [color] = useState('#000');
+  const [color, setColor] = useState('#000');
+  const [strokeWidth, setStrokeWidth] = useState(2);
+  const [canvasClass, setCanvasClass] = useState('penSelected');
   const [paths, setPaths] = useState<Array<any>>([]);
   const [started, setStarted] = useState(false);
   const [timerVal, setTimerVal] = useState(0);
@@ -31,7 +34,9 @@ const CollabCanvas = ({
       setPaths(data.paths);
       for (const pathItem of data.paths) {
         const newPath = new paper.Path(pathItem.path[1]);
-        newPath.strokeColor = new paper.Color('#000');
+        newPath.strokeColor = new paper.Color(
+          pathItem.path[1].strokeColor[0] === 0 ? '#000' : '#fff'
+        );
       }
     }
   }, [data]);
@@ -40,24 +45,36 @@ const CollabCanvas = ({
     const canvas = canvasRef.current;
     paper.setup(canvas || 'myCanvas');
     socket.emit('startCanvas', id);
-  }, [color, id, socket]);
+  }, [id, socket]);
 
   useEffect(() => {
     let myPath: paper.Path;
+    let timeStamps: Array<any> = [];
 
     paper.view.onMouseDown = (event: any) => {
       myPath = new paper.Path();
       myPath.strokeColor = new paper.Color(color);
+      myPath.strokeWidth = strokeWidth;
       myPath.add(event.point);
+      timeStamps.push(event.timeStamp);
     };
 
     paper.view.onMouseDrag = (event: any) => {
       myPath.add(event.point);
+      timeStamps.push(event.timeStamp);
     };
 
     paper.view.onMouseUp = () => {
       console.log(myPath);
-      setPaths([...paths, { path: myPath, id: studyname, time: Date.now() }]);
+      setPaths([
+        ...paths,
+        {
+          path: myPath,
+          id: studyname,
+          time: Date.now(),
+          timeStamps: timeStamps
+        }
+      ]);
     };
 
     const handleUndo = (event: any) => {
@@ -76,7 +93,7 @@ const CollabCanvas = ({
     return () => {
       document.removeEventListener('keydown', handleUndo);
     };
-  }, [color, id, paths, studyname]);
+  }, [color, id, paths, strokeWidth, studyname]);
 
   const handleSketchStart = () => {
     setStarted(true);
@@ -108,28 +125,29 @@ const CollabCanvas = ({
             <h2 className='iconText'>CSketch Session</h2>
           </div>
         </Link>
-        {/* <div className='drawingTools'>
+        <div className='drawingTools'>
           <div
             className='colorIcon'
-            onClick={() => setColor('#c4c4c4')}
-            style={{ backgroundColor: '#c4c4c4' }}
+            onClick={() => {
+              setCanvasClass('eraserSelected');
+              setColor('#fff');
+              setStrokeWidth(10);
+            }}
+            style={{
+              backgroundImage: `url(${Eraser})`,
+              backgroundSize: 'contain'
+            }}
           ></div>
           <div
             className='colorIcon'
-            onClick={() => setColor('#808080')}
-            style={{ backgroundColor: '#808080' }}
-          ></div>
-          <div
-            className='colorIcon'
-            onClick={() => setColor('#424242')}
-            style={{ backgroundColor: '#424242' }}
-          ></div>
-          <div
-            className='colorIcon'
-            onClick={() => setColor('#000')}
+            onClick={() => {
+              setCanvasClass('penSelected');
+              setColor('#000');
+              setStrokeWidth(5);
+            }}
             style={{ backgroundColor: '#000' }}
           ></div>
-        </div> */}
+        </div>
         {data && (
           <div className='prompt'>
             <strong>Prompt: </strong>
@@ -166,7 +184,12 @@ const CollabCanvas = ({
             )}
           </div>
         )}
-        <canvas id='myCanvas' ref={canvasRef} data-paper-resize></canvas>
+        <canvas
+          id='myCanvas'
+          className={canvasClass}
+          ref={canvasRef}
+          data-paper-resize
+        ></canvas>
       </div>
     </div>
   );
@@ -197,7 +220,6 @@ export const StudyDraw = ({ socket }: { socket: any }) => {
         console.log(d);
         setData(d);
       });
-    // window.sessionStorage.setItem('studycode', '');
   }, [id, router, socket]);
 
   const updateSession = (data: any) => {
