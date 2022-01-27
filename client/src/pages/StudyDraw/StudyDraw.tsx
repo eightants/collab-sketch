@@ -11,13 +11,17 @@ const CollabCanvas = ({
   id,
   studyname,
   data,
-  setData
+  setData,
+  pathsToSend,
+  setPathsToSend
 }: {
   socket: any;
   id: string;
   studyname: string;
   data: any;
   setData: (data: any) => void;
+  pathsToSend: Array<any>;
+  setPathsToSend: (p: any) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [color, setColor] = useState('#000');
@@ -60,14 +64,28 @@ const CollabCanvas = ({
     };
 
     paper.view.onMouseDrag = (event: any) => {
+      if (!myPath) {
+        myPath = new paper.Path();
+        myPath.strokeColor = new paper.Color(color);
+        myPath.strokeWidth = strokeWidth;
+      }
       myPath.add(event.point);
       timeStamps.push(event.timeStamp);
     };
 
     paper.view.onMouseUp = () => {
-      console.log(myPath);
+      // console.log(myPath);
       setPaths([
         ...paths,
+        {
+          path: myPath,
+          id: studyname,
+          time: Date.now(),
+          timeStamps: timeStamps
+        }
+      ]);
+      setPathsToSend([
+        ...pathsToSend,
         {
           path: myPath,
           id: studyname,
@@ -93,12 +111,20 @@ const CollabCanvas = ({
     return () => {
       document.removeEventListener('keydown', handleUndo);
     };
-  }, [color, id, paths, strokeWidth, studyname]);
+  }, [color, id, paths, pathsToSend, setPathsToSend, strokeWidth, studyname]);
 
   const handleSketchStart = () => {
     setStarted(true);
     const timerInt = setInterval(() => {
       setTimerVal((curr) => {
+        if (curr % 5 === 0) {
+          setPathsToSend((pathsToSend: any) => {
+            if (pathsToSend.length > 0) {
+              setData({ ...data, paths: pathsToSend });
+            }
+            return pathsToSend;
+          });
+        }
         if (curr <= 0) {
           clearInterval(timerInt);
           handleSketchEnd();
@@ -112,7 +138,6 @@ const CollabCanvas = ({
   const handleSketchEnd = () => {
     setStarted(false);
     setPaths((paths) => {
-      setData({ ...data, paths: paths });
       return paths;
     });
   };
@@ -207,6 +232,7 @@ export const StudyDraw = ({ socket }: { socket: any }) => {
   const studyname = window.sessionStorage.getItem('studyname') || '';
   const router = useHistory();
   const [data, setData] = useState<sessionData>();
+  const [pathsToSend, setPathsToSend] = useState<Array<any>>([]);
 
   useEffect(() => {
     const roomId = sessionStorage.getItem('studycode');
@@ -228,7 +254,9 @@ export const StudyDraw = ({ socket }: { socket: any }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     };
-    fetch(DOMAIN + '/api/create', requestOptions).then((res) => {});
+    fetch(DOMAIN + '/api/append', requestOptions).then((res) => {
+      setPathsToSend([]);
+    });
   };
 
   return (
@@ -239,6 +267,8 @@ export const StudyDraw = ({ socket }: { socket: any }) => {
         studyname={studyname}
         data={data}
         setData={updateSession}
+        pathsToSend={pathsToSend}
+        setPathsToSend={setPathsToSend}
       />
     </div>
   );

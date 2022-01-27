@@ -24,6 +24,8 @@ async function mongo(operation, params) {
       await updateRoom(client, params);
     } else if (operation == 'getRoom') {
       return await getRoom(client, params);
+    } else if (operation == "appendPaths") {
+      await appendPaths(client, params);
     }
   } catch (e) {
     console.error(e);
@@ -31,6 +33,22 @@ async function mongo(operation, params) {
     await client.close();
   }
 }
+
+async function appendPaths(client, params) {
+  let id = params["_id"]
+  const paths = params["paths"]
+  result = await client.db('sketch').collection('rooms').updateOne(
+    { _id: id },
+    {
+      $push: {
+        paths: {
+          $each: paths
+        }
+      }
+    }
+  );
+}
+
 
 async function updateRoom(client, params) {
   let id = params["_id"]
@@ -49,6 +67,17 @@ async function getRoom(client, id) {
     .collection('rooms')
     .findOne({ _id: id });
 }
+
+
+app.post('/api/append', cors(), async function (req, res) {
+  var obj = req.body
+  // console.log(obj);
+  await mongo('appendPaths', obj)
+    .then((re) => {
+      return res.json(re);
+    })
+    .catch(console.error);
+});
 
 app.post('/api/create', cors(), async function (req, res) {
   var obj = req.body
