@@ -7,5 +7,7 @@ Make sure you have Node.js and npm installed.
 
 ## Developing
 
-1. In `/server/`, run `npm start`
-2. In `/client/` in another terminal window, run `npm start`
+1. In `/server/app.js`, set `const uri` to be the MongoDB URI for local development. 
+2. In `/server/`, run `npm start`
+3. In `/client/constants.tsx`, comment out `DOMAIN = ""` and uncomment the other line so you are using your local server.
+4. In `/client/` in another terminal window, run `npm start`
