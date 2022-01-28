@@ -117,7 +117,7 @@ const CollabCanvas = ({
     setStarted(true);
     const timerInt = setInterval(() => {
       setTimerVal((curr) => {
-        if (curr % 5 === 0) {
+        if (curr % 10 === 0) {
           setPathsToSend((pathsToSend: any) => {
             if (pathsToSend.length > 0) {
               setData({ ...data, paths: pathsToSend });
