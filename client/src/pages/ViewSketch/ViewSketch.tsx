@@ -30,15 +30,16 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
 
   const startReplay = () => {
     if (data) {
+      const filteredPaths = data.paths.filter((obj:any) => obj.path)
       const timerInt = setInterval(() => {
         setCurrPath((curr) => {
-          if (curr >= data.paths.length) {
+          if (curr >= filteredPaths.length) {
             clearInterval(timerInt);
             return 0;
           }
-          const newPath = new paper.Path(data.paths[curr].path[1]);
+          const newPath = new paper.Path(filteredPaths[curr].path[1]);
           newPath.strokeColor = new paper.Color(
-            data.paths[curr].path[1].strokeColor[0] === 0 ? '#000' : '#fff'
+            filteredPaths[curr].path[1].strokeColor[0] === 0 ? '#000' : '#fff'
           );
           return curr + 1;
         });

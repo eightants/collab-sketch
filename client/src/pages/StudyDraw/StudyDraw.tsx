@@ -35,8 +35,10 @@ const CollabCanvas = ({
   useEffect(() => {
     if (data) {
       setTimerVal(data.timer);
-      setPaths(data.paths);
-      for (const pathItem of data.paths) {
+      const filteredPaths = data.paths.filter((obj:any) => obj.path)
+      setPaths(filteredPaths);
+      console.log(data.paths)
+      for (const pathItem of filteredPaths) {
         const newPath = new paper.Path(pathItem.path[1]);
         newPath.strokeColor = new paper.Color(
           pathItem.path[1].strokeColor[0] === 0 ? '#000' : '#fff'
