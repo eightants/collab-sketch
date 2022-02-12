@@ -11,7 +11,9 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
   const { id } = useParams<{ id: string }>();
   const [, setCurrPath] = useState(0);
   const [clearCanvasTrigger, setClearCanvasTrigger] = useState(false);
-  const [timerVar, setTimerVar] = useState(setInterval(() => {}, 100));
+  // const [timerVar, setTimerVar] = useState(setInterval(() => {}, 100));
+  const [userList, setUserList] = useState<any>({});
+  const [currentUser, setCurrentUser] = useState(-1);
 
   useEffect(() => {
     const requestOptions = {
@@ -22,6 +24,15 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
       .then((res) => res.json())
       .then((d) => {
         console.log(d);
+        const totalUsers: any = {};
+        d.paths.map((obj: any) => {
+          if (obj.id && !totalUsers[obj.id]) {
+            totalUsers[obj.id] = 1;
+          }
+          return obj;
+        });
+        console.log(totalUsers);
+        setUserList(totalUsers);
         setData(d);
       });
   }, [id, router, socket]);
@@ -30,27 +41,45 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
 
   const startReplay = () => {
     if (data) {
-      const filteredPaths = data.paths.filter((obj:any) => obj.path)
-      const timerInt = setInterval(() => {
-        setCurrPath((curr) => {
-          if (curr >= filteredPaths.length) {
-            clearInterval(timerInt);
-            return 0;
-          }
-          const newPath = new paper.Path(filteredPaths[curr].path[1]);
+      if (currentUser >= Object.keys(userList).length) {
+        return;
+      }
+      const filteredPaths = data.paths.filter((obj: any) => obj.path);
+      const currentIndex = currentUser + 1;
+      setCurrentUser(currentIndex);
+      const currentId = Object.keys(userList)[currentIndex];
+      console.log(currentIndex, currentId);
+      filteredPaths.map((obj: any) => {
+        if (obj.id === currentId) {
+          // console.log(obj);
+          const newPath = new paper.Path(obj.path[1]);
           newPath.strokeColor = new paper.Color(
-            filteredPaths[curr].path[1].strokeColor[0] === 0 ? '#000' : '#fff'
+            obj.path[1].strokeColor[0] === 0 ? '#000' : '#fff'
           );
-          return curr + 1;
-        });
-      }, 100);
-      setTimerVar(timerInt);
+        }
+        return obj;
+      });
+      // const timerInt = setInterval(() => {
+      //   setCurrPath((curr) => {
+      //     if (curr >= filteredPaths.length) {
+      //       clearInterval(timerInt);
+      //       return 0;
+      //     }
+      //     const newPath = new paper.Path(filteredPaths[curr].path[1]);
+      //     newPath.strokeColor = new paper.Color(
+      //       filteredPaths[curr].path[1].strokeColor[0] === 0 ? '#000' : '#fff'
+      //     );
+      //     return curr + 1;
+      //   });
+      // }, 100);
+      // setTimerVar(timerInt);
     }
   };
 
   const clearCanvas = () => {
     if (data) {
-      clearInterval(timerVar);
+      // clearInterval(timerVar);
+      setCurrentUser(-1);
       setClearCanvasTrigger(true);
       setCurrPath(0);
     }
@@ -78,8 +107,13 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
             </div>
           )}
           <div className='prompt'>
-            <Button text={'Start Replay'} onClick={startReplay} />
+            <Button text={'Next User'} onClick={startReplay} />
             <Button text={'Clear'} onClick={clearCanvas} />
+          </div>
+          <div className='prompt'>
+            {Object.keys(userList).map((user: string, ind: number) =>
+              ind <= currentUser ? <p key={ind}>{user}</p> : <></>
+            )}
           </div>
         </div>
         <div className='canvasDiv'>
