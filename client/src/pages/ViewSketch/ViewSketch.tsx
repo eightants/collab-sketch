@@ -23,7 +23,7 @@ export const ViewSketch = ({ socket }: { socket: any }) => {
     fetch(DOMAIN + '/api/get/' + id, requestOptions)
       .then((res) => res.json())
       .then((d) => {
-        console.log(d);
+        // console.log(d);
         const totalUsers: any = {};
         d.paths.map((obj: any) => {
           if (obj.id && !totalUsers[obj.id]) {
